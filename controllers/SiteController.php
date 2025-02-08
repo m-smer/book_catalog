@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\Author;
+use app\models\Book;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -61,7 +63,19 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+
+        $author = Author::findOne(2);
+        foreach ($author->books as $book) {
+            echo $book->title;
+        }
+
+        $book = Book::findOne(1);
+        foreach ($book->authors as $author) {
+            echo $author->full_name;
+        }
+
+die();
+//        return $this->render('index');
     }
 
     /**

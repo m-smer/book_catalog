@@ -2,103 +2,86 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $user_id
+ * @property string|null $full_name
+ * @property int $phone_number
+ * @property string $auth_key
+ *
+ * @property Subscription[] $subscriptions
+ */
+class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
-
     /**
      * {@inheritdoc}
      */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return 'user';
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public function rules()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['phone_number', 'auth_key'], 'required'],
+            [['phone_number'], 'integer'],
+            [['full_name'], 'string', 'max' => 255],
+            [['auth_key'], 'string', 'max' => 32],
+        ];
     }
 
     /**
-     * Finds user by username
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'user_id' => 'User ID',
+            'full_name' => 'Full Name',
+            'phone_number' => 'Phone Number',
+            'auth_key' => 'Auth Key',
+        ];
+    }
+
+    /**
+     * Gets query for [[Subscriptions]].
      *
-     * @param string $username
-     * @return static|null
+     * @return \yii\db\ActiveQuery
      */
-    public static function findByUsername($username)
+    public function getSubscriptions()
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
+        return $this->hasMany(Subscription::class, ['user_id' => 'user_id']);
+    }
 
+    public static function findIdentity($id): ?User
+    {
+        return static::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null): null
+    {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getId()
+    public function getId(): int
     {
-        return $this->id;
+        return $this->user_id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthKey()
+    public function getAuthKey(): string
     {
-        return $this->authKey;
+        return $this->auth_key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey): bool
     {
         return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
     }
 }

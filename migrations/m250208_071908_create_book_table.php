@@ -16,7 +16,7 @@ class m250208_071908_create_book_table extends Migration
             'book_id' => $this->primaryKey(),
             'title' => $this->string()->notNull(),
             'year' => $this->integer()->notNull(),
-            'isbn' => $this->string()->notNull(),
+            'isbn' => $this->string()->notNull()->unique(),
         ]);
     }
 

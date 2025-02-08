@@ -35,6 +35,12 @@ class m250208_082547_create_subscription_table extends Migration
             'author_id',
             'CASCADE',
         );
+
+        $this->createIndex(
+            'idx-subscription-unique',
+            'subscription',
+            ['user_id', 'author_id'],
+            true);
     }
 
     /**
@@ -42,6 +48,7 @@ class m250208_082547_create_subscription_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropIndex('idx-subscription-unique', 'subscription');
         $this->dropForeignKey('fk-subscription-author_id', 'subscription');
         $this->dropForeignKey('fk-subscription-user_id', 'subscription');
         $this->dropTable('{{%subscription}}');

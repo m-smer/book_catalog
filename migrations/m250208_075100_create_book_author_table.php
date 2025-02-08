@@ -35,6 +35,13 @@ class m250208_075100_create_book_author_table extends Migration
             'author_id',
             'RESTRICT'
         );
+
+        $this->createIndex(
+            'idx-book_author-unique',
+            'book_author',
+            ['book_id', 'author_id'],
+            true);
+
     }
 
     /**
@@ -42,6 +49,7 @@ class m250208_075100_create_book_author_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropIndex('idx-book_author-unique', 'book_author');
         $this->dropForeignKey('fk-book_author-book_id', 'book_author');
         $this->dropForeignKey('fk-book_author-author_id', 'book_author');
         $this->dropTable('{{%book_author}}');
