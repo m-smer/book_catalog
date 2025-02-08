@@ -1,9 +1,61 @@
-version: '2'
 services:
-  php:
-    image: yiisoftware/yii2-php:7.4-apache
+
+  nginx:
+    build: docker/nginx
+    container_name: 'book_catalog_nginx'
+    restart: always
+    working_dir: /app
+    expose:
+      - 80
     volumes:
-      - ~/.composer-docker/cache:/root/.composer/cache:delegated
-      - ./:/app:delegated
+      - ./:/app
+      - ./docker/nginx/templates:/etc/nginx/templates
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - php
+    networks:
+      - backend
+      - nginx-proxy_nginx-proxy
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - NGINX_SERVER_NAME=${NGINX_SERVER_NAME}
+      - TZ=${WORKSPACE_TIMEZONE}
+
+  php:
+    container_name: 'book_catalog_php'
+    build: ./docker/php
+    volumes:
+      - ./:/app
+      - ./logs/php:/var/log
+      - ./logs/yii:/app/runtime/logs
+      - ./logs/xdebug:/tmp/xdebug
+    working_dir: /app
+    environment:
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=docker}
+    env_file:
+      - ./.env
+    networks:
+      - backend
+
+  db:
+    container_name: 'book_catalog_db'
+    image: percona:8.0.40-31
+    restart: always
     ports:
-      - '8000:80'
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      TZ: ${WORKSPACE_TIMEZONE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - backend
+
+networks:
+  backend:
+  nginx-proxy_nginx-proxy:
+    external: true
