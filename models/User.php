@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\services\OTPCode\OTPCodeService;
 use Yii;
 
 /**
@@ -16,6 +17,7 @@ use Yii;
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
+
     /**
      * {@inheritdoc}
      */
@@ -30,6 +32,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
+            //todo правила на номер телефона
             [['phone_number', 'auth_key'], 'required'],
             [['phone_number'], 'integer'],
             [['full_name'], 'string', 'max' => 255],
@@ -50,6 +53,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         ];
     }
 
+    public function setOTPCodeService(OTPCodeService $OTPCodeService): void
+    {
+        $this->OTPCodeService = $OTPCodeService;
+    }
+
     /**
      * Gets query for [[Subscriptions]].
      *
@@ -63,6 +71,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public static function findIdentity($id): ?User
     {
         return static::findOne($id);
+    }
+    public static function findIdentityPhoneNumber(int $phoneNumber): ?User
+    {
+        return static::findOne(['phone_number' => $phoneNumber]);
     }
 
     public static function findIdentityByAccessToken($token, $type = null): null
@@ -83,5 +95,23 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validateAuthKey($authKey): bool
     {
         return $this->authKey === $authKey;
+    }
+
+    public function validateOTPCode(string $OTPCode): bool
+    {
+        $OTPCodeService = Yii::$container->get(OTPCodeService::class);
+
+        return $OTPCodeService->isValid($this, $OTPCode);
+    }
+
+    public function beforeSave($insert): bool
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->auth_key = \Yii::$app->security->generateRandomString();
+            }
+            return true;
+        }
+        return false;
     }
 }

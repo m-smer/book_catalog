@@ -13,6 +13,8 @@ use Yii;
  * @property string $isbn
  *
  * @property Author[] $authors
+ * @property Image[] $images
+ * @property BookAuthor[] $bookAuthors
  */
 class Book extends \yii\db\ActiveRecord
 {
@@ -31,7 +33,7 @@ class Book extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'year', 'isbn'], 'required'],
-            [['year'], 'integer'],
+            [['year'], 'integer', 'max' => date('Y')],
             [['title', 'isbn'], 'string', 'max' => 255],
             [['isbn'], 'unique'],
         ];
@@ -57,7 +59,21 @@ class Book extends \yii\db\ActiveRecord
      */
     public function getAuthors()
     {
-        return $this->hasMany(Author::class, ['author_id' => 'author_id'])->viaTable('book_author', ['book_id' => 'book_id']);
+        return $this->hasMany(Author::class, ['author_id' => 'author_id'])
+            ->viaTable('book_author', ['book_id' => 'book_id']);
     }
+
+    public function getImages()
+    {
+        return $this->hasMany(Image::class, ['owner_id' => 'book_id'])
+            ->andWhere(['owner_type' => 'book']);
+    }
+
+//    public function getFirstImage()
+//    {
+//        return $this->hasOne(Image::class, ['owner_id' => 'book_id'])
+//            ->andWhere(['owner_type' => 'book'])
+//            ->one();
+//    }
 
 }

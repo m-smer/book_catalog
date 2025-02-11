@@ -24,7 +24,7 @@ class m250208_075100_create_book_author_table extends Migration
             'book_id',
             'book',
             'book_id',
-            'RESTRICT',
+            'CASCADE',
         );
 
         $this->addForeignKey(

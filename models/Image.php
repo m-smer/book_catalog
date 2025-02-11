@@ -49,4 +49,10 @@ class Image extends \yii\db\ActiveRecord
             'owner_id' => 'Owner ID',
         ];
     }
+
+    public function getImages()
+    {
+        return $this->hasMany(Image::class, ['owner_id' => 'book_id'])
+            ->andWhere(['owner_type' => 'book']);
+    }
 }

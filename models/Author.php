@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\ForbiddenHttpException;
 
 /**
  * This is the model class for table "author".
@@ -10,6 +11,7 @@ use Yii;
  * @property int $author_id
  * @property string $full_name
  *
+ * @property BookAuthor[] $bookAuthors
  * @property Book[] $books
  * @property Subscription[] $subscriptions
  * @property User[] $users
@@ -46,6 +48,15 @@ class Author extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * Gets query for [[BookAuthors]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBookAuthors()
+    {
+        return $this->hasMany(BookAuthor::class, ['author_id' => 'author_id']);
+    }
 
     /**
      * Gets query for [[Books]].
@@ -75,5 +86,14 @@ class Author extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(User::class, ['user_id' => 'user_id'])->viaTable('subscription', ['author_id' => 'author_id']);
+    }
+
+    public function beforeDelete(): bool
+    {
+        $bookCount = $this->getBooks()->count();
+        if ($bookCount > 0) {
+            throw new ForbiddenHttpException('Нельзя удалить автора, пока существуют книги, им написанные.');
+        }
+        return parent::beforeDelete();
     }
 }

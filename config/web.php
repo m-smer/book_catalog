@@ -22,6 +22,7 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['user/login'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -49,6 +50,13 @@ $config = [
             ],
         ],
 
+    ],
+    'container' => [
+        'definitions' => [
+            \app\services\OTPCode\NotificatorInterface::class => [
+                'class' => app\services\Notificator\SMSNotificatorService::class,
+            ]
+        ],
     ],
     'params' => $params,
 ];
