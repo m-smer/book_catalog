@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\caching\TagDependency;
 
 /**
  * This is the model class for table "book".
@@ -69,11 +70,17 @@ class Book extends \yii\db\ActiveRecord
             ->andWhere(['owner_type' => 'book']);
     }
 
-//    public function getFirstImage()
-//    {
-//        return $this->hasOne(Image::class, ['owner_id' => 'book_id'])
-//            ->andWhere(['owner_type' => 'book'])
-//            ->one();
-//    }
+    public function beforeSave($insert): bool
+    {
+        // сносим кэш рейтинга авторов
+        TagDependency::invalidate(Yii::$app->cache, [Author::TOP_CACHE_KEY_PREFIX]);
+        return parent::beforeSave($insert);
+    }
 
+    public function afterDelete(): void
+    {
+        //можно перенести в behavior
+        TagDependency::invalidate(Yii::$app->cache, [Author::TOP_CACHE_KEY_PREFIX]);
+        parent::afterDelete();
+    }
 }

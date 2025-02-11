@@ -128,6 +128,15 @@ class AuthorController extends Controller
         return $this->redirect(['index']);
     }
 
+
+    public function actionRating() {
+        $authors = Author::getTop();
+        return $this->render('rating', [
+            'authors' => $authors,
+        ]);
+    }
+
+
     /**
      * Finds the Author model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

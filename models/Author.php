@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\caching\TagDependency;
+use yii\db\Exception;
 use yii\web\ForbiddenHttpException;
 
 /**
@@ -18,6 +20,8 @@ use yii\web\ForbiddenHttpException;
  */
 class Author extends \yii\db\ActiveRecord
 {
+    public const TOP_CACHE_KEY_PREFIX = 'AUTHORS_TOP_';
+
     /**
      * {@inheritdoc}
      */
@@ -96,4 +100,31 @@ class Author extends \yii\db\ActiveRecord
         }
         return parent::beforeDelete();
     }
+
+    public static function getTop(int $limit = 10): array
+    {
+        $cacheKey = self::TOP_CACHE_KEY_PREFIX . $limit;
+        if (!$array = Yii::$app->cache->get($cacheKey)) {
+            $array =  Yii::$app->db->createCommand('
+                SELECT full_name, count(book_id) as books_count
+                FROM author
+                LEFT JOIN book_author ON author.author_id = book_author.author_id
+                group by author.author_id
+                ORDER BY books_count DESC 
+                limit :limit
+            ')
+                ->bindValue(':limit', $limit)
+                ->queryAll();
+
+            Yii::$app->cache->set(
+                $cacheKey,
+                $array,
+                0,
+                new TagDependency(['tags' => [self::TOP_CACHE_KEY_PREFIX]])
+            );
+        }
+
+        return $array;
+    }
+
 }

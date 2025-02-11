@@ -35,6 +35,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             //todo правила на номер телефона
             [['phone_number', 'auth_key'], 'required'],
             [['phone_number'], 'integer'],
+            [['phone_number'], 'unique'],
             [['full_name'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
         ];

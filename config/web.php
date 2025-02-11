@@ -49,6 +49,12 @@ $config = [
             'rules' => [
             ],
         ],
+        'redis' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'book_catalog_redis',
+            'port' => 6379,
+            'database' => 0,
+        ],
 
     ],
     'container' => [

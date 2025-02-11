@@ -35,7 +35,11 @@ class SiteController extends Controller
      * @return string
      */
     public function actionIndex()
+
     {
+//        Yii::$app->redis->set('mykey', 'some value');
+//        echo Yii::$app->redis->get('mykey');
+//        die();
 //        $user = User::findOne(1);
 //        $container =  Yii::$container;
 //        $container->set(OTPCodeService::class, [

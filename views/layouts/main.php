@@ -39,7 +39,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav'],
         'items' => [
-            ['label' => 'Rating', 'url' => ['/site/index']],
+            ['label' => 'Rating', 'url' => ['/author/rating']],
             ['label' => 'Authors', 'url' => ['/author']],
             ['label' => 'Books', 'url' => ['/book']],
             Yii::$app->user->isGuest

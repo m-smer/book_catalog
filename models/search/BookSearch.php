@@ -41,7 +41,7 @@ class BookSearch extends Book
      */
     public function search($params)
     {
-        $query = Book::find()->joinWith('authors');
+        $query = Book::find()->joinWith('authors')->distinct();;
 
         // add conditions that should always apply here
 
