@@ -33,7 +33,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             //todo правила на номер телефона
-            [['phone_number', 'auth_key'], 'required'],
+            [['phone_number'], 'required'],
             [['phone_number'], 'integer'],
             [['phone_number'], 'unique'],
             [['full_name'], 'string', 'max' => 255],
@@ -52,11 +52,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'phone_number' => 'Phone Number',
             'auth_key' => 'Auth Key',
         ];
-    }
-
-    public function setOTPCodeService(OTPCodeService $OTPCodeService): void
-    {
-        $this->OTPCodeService = $OTPCodeService;
     }
 
     /**

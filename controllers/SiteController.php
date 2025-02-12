@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\Form\ContactForm;
 use app\models\Form\LoginForm;
+use app\models\User;
+use app\services\OTPCode\OTPCodeService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -37,21 +39,9 @@ class SiteController extends Controller
     public function actionIndex()
 
     {
-//        Yii::$app->redis->set('mykey', 'some value');
-//        echo Yii::$app->redis->get('mykey');
-//        die();
-//        $user = User::findOne(1);
-//        $container =  Yii::$container;
-//        $container->set(OTPCodeService::class, [
-//            'notificator' => new SMSNotificatorService(),
-//                ]
-//        );
+//        $OTPCodeService = Yii::$container->get(OTPCodeService::class);
+//        $OTPCodeService->setNewCode(1);
 
-//        $l = Yii::$container->get(OTPCodeService::class);
-
-//        $l->setNewCode(123,342);
-//        echo 'ddd';
-//        die();
         return $this->render('index');
     }
 

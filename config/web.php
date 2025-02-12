@@ -6,7 +6,7 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'queue'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -55,11 +55,19 @@ $config = [
             'port' => 6379,
             'database' => 0,
         ],
-
+        'queue' => [
+            'class' => yii\queue\amqp_interop\Queue::class,
+            'driver' => yii\queue\amqp_interop\Queue::ENQUEUE_AMQP_LIB,
+            'port' => env('RABBITMQ_PORT'),
+            'user' => env('RABBITMQ_USER'),
+            'host' => env('RABBITMQ_HOST'),
+            'password' => env('RABBITMQ_PASSWORD'),
+            'queueName' => 'notification_queue',
+        ],
     ],
     'container' => [
         'definitions' => [
-            \app\services\OTPCode\NotificatorInterface::class => [
+            \app\services\Notificator\NotificatorInterface::class => [
                 'class' => app\services\Notificator\SMSNotificatorService::class,
             ]
         ],

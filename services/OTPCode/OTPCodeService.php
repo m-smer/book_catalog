@@ -3,7 +3,7 @@
 namespace app\services\OTPCode;
 
 use app\models\User;
-use yii\base\BaseObject;
+use app\services\Notificator\NotificatorInterface;
 
 class OTPCodeService
 {

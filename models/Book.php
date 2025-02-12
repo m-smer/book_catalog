@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\services\OTPCode\OTPCodeService;
 use Yii;
 use yii\caching\TagDependency;
 
@@ -60,8 +61,12 @@ class Book extends \yii\db\ActiveRecord
      */
     public function getAuthors()
     {
-        return $this->hasMany(Author::class, ['author_id' => 'author_id'])
-            ->viaTable('book_author', ['book_id' => 'book_id']);
+        return $this->hasMany(Author::class, ['author_id' => 'author_id'])->via('bookAuthors');
+    }
+
+    public function getBookAuthors()
+    {
+        return $this->hasMany(BookAuthor::class, ['book_id' => 'book_id']);
     }
 
     public function getImages()
@@ -83,4 +88,5 @@ class Book extends \yii\db\ActiveRecord
         TagDependency::invalidate(Yii::$app->cache, [Author::TOP_CACHE_KEY_PREFIX]);
         parent::afterDelete();
     }
+
 }

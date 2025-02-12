@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y \
         supervisor \
         libzip-dev \
     && pecl install xdebug-3.4.1 \
-    && docker-php-ext-install -j$(nproc) iconv mbstring mysqli pdo_mysql zip opcache  \
+    && docker-php-ext-install -j$(nproc) iconv mbstring mysqli pdo_mysql zip opcache sockets  \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable xdebug

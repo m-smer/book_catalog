@@ -24,7 +24,7 @@ class FillController extends Controller
         User::deleteAll();
         Book::deleteAll();
         Author::deleteAll();
-//die();
+
         $users = [];
         for ($i = 0; $i < 3; $i++) {
             $users[$i] = new User([
@@ -59,20 +59,12 @@ class FillController extends Controller
             };
 
             $authorsIndexes = array_rand($authors, rand( 1, 5));
-//            var_dump($authorsIndexes);
             if (is_int($authorsIndexes)) {
-//                var_dump($authorsIndexes);
-//                die();
                 $authorsIndexes = [$authorsIndexes];
             }
             foreach ($authorsIndexes as $index) {
                 $book->link('authors', $authors[$index]);
             }
-//            for ($j = 0; $j < $authorsCount; $j++) {
-//                $authorIndex = rand(1, self::AUTHORS_NUM);
-//                $book->link('authors', $authors[$authorIndex]);
-//            }
-
         }
     }
 

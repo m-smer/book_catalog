@@ -2,13 +2,16 @@
 
 namespace app\services\Notificator;
 
-use app\services\OTPCode\NotificatorInterface;
+use app\jobs\SendSMSJob;
+use Yii;
 
 class SMSNotificatorService implements NotificatorInterface
 {
-
-    public function send(int $phone, string $message): void
+    public function send(int $phoneNumber, string $message): void
     {
-//        echo 'СМС НОТИФ!'; die();
+        Yii::$app->queue->push(new SendSmsJob([
+            'phoneNumber' => $phoneNumber,
+            'message' => $message,
+        ]));
     }
 }

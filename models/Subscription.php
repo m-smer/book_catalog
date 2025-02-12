@@ -2,7 +2,10 @@
 
 namespace app\models;
 
+use app\services\Notificator\NotificatorInterface;
+use app\services\OTPCode\OTPCodeService;
 use Yii;
+use yii\web\ServerErrorHttpException;
 
 /**
  * This is the model class for table "subscription".
@@ -68,5 +71,52 @@ class Subscription extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['user_id' => 'user_id']);
+    }
+
+    public static function subscribe(int $phone_number, int $authorId): bool
+    {
+        $userAttributes = ['phone_number' => $phone_number];
+        $user = User::findOne($userAttributes);
+
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            if (!$user) {
+                $user = new User($userAttributes);
+                if (!$user->save()) {
+                    throw new \Exception('Не удалось сохранить пользователя.');
+                }
+            }
+
+            $subscriptionAttributes = [
+                'author_id' => $authorId,
+                'user_id' => $user->user_id,
+            ];
+
+
+            if (!Subscription::findOne($subscriptionAttributes)) {
+                $subscription = new self($subscriptionAttributes);
+                if (!$subscription->save()) {
+                    throw new \Exception('Не удалось сохранить подписку.');
+                }
+            }
+
+            $transaction->commit();
+            return true;
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            return false;
+        }
+    }
+
+    public static function newBookNotify(Book $book): void
+    {
+        $notificator = Yii::$container->get(NotificatorInterface::class);
+
+        foreach ($book->authors as $author) {
+            foreach ($author->subscriptions as $subscription) {
+                $message = 'У автора ' . $author->full_name . ' вышла новая книга ' . $book->title. '!';
+                $notificator->send($subscription->user->phone_number, $message);
+            }
+        }
     }
 }

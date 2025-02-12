@@ -24,6 +24,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+
+        <?= Html::a('Subscribe', ['subscription/subscribe', 'author_id' => $model->author_id], [
+            'class' => 'btn btn-success',
+        ]) ?>
     </p>
 
     <?= DetailView::widget([

@@ -14,7 +14,7 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.4.0",
+        "php": ">=8.4.0",
         "yiisoft/yii2": "~2.0.45",
         "yiisoft/yii2-bootstrap5": "~2.0.2",
         "yiisoft/yii2-symfonymailer": "~2.0.3",
@@ -22,7 +22,9 @@
         "kartik-v/yii2-widget-select2": "dev-master",
         "kartik-v/yii2-widget-fileinput": "^1.1",
         "yiisoft/yii2-redis": "^2.0",
-        "fakerphp/faker": "^1.24"
+        "fakerphp/faker": "^1.24",
+        "yiisoft/yii2-queue": "^2.3",
+        "enqueue/amqp-lib": "^0.10.19"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -35,11 +37,13 @@
         "codeception/module-filesystem": "^3.0 || ^2.0 || ^1.1",
         "codeception/verify": "^3.0 || ^2.2",
         "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
-        "vimeo/psalm": "^6.5"
+        "vimeo/psalm": "^6.5",
+        "cweagans/composer-patches": "^1.7"
     },
     "config": {
         "allow-plugins": {
-            "yiisoft/yii2-composer" : true
+            "yiisoft/yii2-composer": true,
+            "cweagans/composer-patches": true
         },
         "process-timeout": 1800,
         "fxp-asset": {
