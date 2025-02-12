@@ -92,8 +92,6 @@ class UserController extends Controller
 
     public function actionSendCode()
     {
-//        var_dump(123);
-//        die();
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $phone_number = \Yii::$app->request->post('phone_number');
 

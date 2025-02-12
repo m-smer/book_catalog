@@ -55,4 +55,18 @@ class Image extends \yii\db\ActiveRecord
         return $this->hasMany(Image::class, ['owner_id' => 'book_id'])
             ->andWhere(['owner_type' => 'book']);
     }
+
+    public function afterDelete(): void
+    {
+        parent::afterDelete();
+        $this->deleteFile();
+    }
+
+    private function deleteFile (): void
+    {
+        $filePath = \Yii::getAlias('@webroot/uploads/' . $this->filename);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+    }
 }

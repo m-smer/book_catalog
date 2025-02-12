@@ -11,16 +11,10 @@ class ImageController extends Controller
     public function actionDelete($id)
     {
         $image = Image::findOne($id);
-        if (!$image) {
+
+        if (!$image || $image->delete()) {
             return false;
         }
-
-        $filePath = \Yii::getAlias('@webroot/uploads/' . $image->filename);
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
-
-        $image->delete();
 
         return true;
     }
