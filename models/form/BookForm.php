@@ -5,6 +5,7 @@ namespace app\models\form;
 use app\models\Book;
 use app\models\Image;
 use yii\base\Model;
+use yii\web\UploadedFile;
 
 class BookForm extends Model
 {
@@ -12,6 +13,8 @@ class BookForm extends Model
     public $year;
     public $isbn;
     public $images;
+
+    public ?Book $ARModel = null;
     public array $existingImages = [];
 
     public array $authorIds = [];
@@ -56,5 +59,29 @@ class BookForm extends Model
             return true;
         }
         return false;
+    }
+
+    public function saveARModel(Book $model): bool {
+        $this->images = UploadedFile::getInstances($this, 'images');
+        if ( $this->validate()) {
+            $model->load($this->attributes, '');
+
+            $transaction = \Yii::$app->db->beginTransaction();
+
+            if ($model->save()) {
+                $model->linkAuthors($this->authorIds);
+
+                if ($this->images && !$this->uploadImages($model->book_id)) {
+                    $this->addError('images', 'Не удалось загрузить изображения');
+                    $transaction->rollBack();
+                    return false;
+                }
+                $transaction->commit();
+                return true;
+            } else {
+                $this->addErrors($model->getErrors());
+                return false;
+            }
+        }
     }
 }

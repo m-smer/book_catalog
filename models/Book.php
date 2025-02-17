@@ -75,6 +75,24 @@ class Book extends \yii\db\ActiveRecord
             ->andWhere(['owner_type' => 'book']);
     }
 
+    public function linkAuthors(array $authorIds): void
+    {
+        $currentBookAuthors = $this->getAuthors()->select('author_id')->column();
+        $newAuthorIds = array_diff($authorIds, $currentBookAuthors);
+        $unlinkAuthorIds = array_diff($newAuthorIds, $currentBookAuthors);
+
+        foreach ($newAuthorIds as $authorId) {
+            $this->link('authors', Author::findOne($authorId));
+        }
+
+        foreach ($unlinkAuthorIds as $authorId) {
+            $author = Author::findOne($authorId);
+            if ($author) {
+                $this->unlink('authors', $author, true);
+            }
+        }
+    }
+
     public function beforeSave($insert): bool
     {
         // сносим кэш рейтинга авторов

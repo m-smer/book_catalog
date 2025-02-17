@@ -83,30 +83,14 @@ class BookController extends Controller
     public function actionCreate()
     {
         $formModel = new BookForm();
+        $book = new Book();
         $authors = Author::find()->all();
 
         if ($formModel->load($this->request->post()))
         {
             $formModel->images = UploadedFile::getInstances($formModel, 'images');
-            if ( $formModel->validate()) {
-                $book = new Book();
-                $book->title = $formModel->title;
-                $book->year = $formModel->year;
-                $book->isbn = $formModel->isbn;
-
-                if ($book->save()) {
-                    foreach ($formModel->authorIds as $authorId) {
-                        $book->link('authors', Author::findOne($authorId));
-                    }
-
-                    if ($formModel->images && !$formModel->uploadImages($book->book_id)) {
-                        $formModel->addError('images', 'Не удалось загрузить изображения');
-                    }
-
-                    return $this->redirect(['view', 'book_id' => $book->book_id]);
-                } else {
-                    $formModel->addErrors($book->getErrors());
-                }
+            if ($formModel->validate() && $formModel->saveARModel($book)) {
+                return $this->redirect(['view', 'book_id' => $book->book_id]);
             }
         }
 
@@ -125,45 +109,21 @@ class BookController extends Controller
      */
     public function actionUpdate(int $book_id)
     {
-        $book = Book::findOne($book_id);
-        if (!$book) {
-            throw new \yii\web\NotFoundHttpException('Книга не найдена.');
-        }
+        $book = $this->findModel($book_id);
+        $authors = Author::find()->all();
 
         $formModel = new BookForm();
-        $formModel->title = $book->title;
-        $formModel->year = $book->year;
-        $formModel->isbn = $book->isbn;
+        $formModel->load($book->attributes, '');
         $formModel->authorIds = $book->getAuthors()->select('author_id')->column(); // Текущие авторы
         $formModel->existingImages = $book->images;
 
-        $authors = Author::find()->all();
-
-        if ($formModel->load($this->request->post())) {
+        if ($formModel->load($this->request->post()))
+        {
             $formModel->images = UploadedFile::getInstances($formModel, 'images');
-            if ($formModel->validate()) {
-                $book->title = $formModel->title;
-                $book->year = $formModel->year;
-                $book->isbn = $formModel->isbn;
-
-                if ($book->save()) {
-                    $book->unlinkAll('authors', true);
-
-                    foreach ($formModel->authorIds as $authorId) {
-                     $book->link('authors', Author::findOne($authorId));
-                    }
-
-                    if ($formModel->images && !$formModel->uploadImages($book->book_id)) {
-                        $formModel->addError('images', 'Не удалось загрузить изображения');
-                    }
-
-                    return $this->redirect(['view', 'book_id' => $book->book_id]);
-                } else {
-                 $formModel->addErrors($book->getErrors());
-                }
+            if ($formModel->validate() && $formModel->saveARModel($book)) {
+                return $this->redirect(['view', 'book_id' => $book->book_id]);
             }
         }
-
 
         return $this->render('update', [
             'formModel' => $formModel,

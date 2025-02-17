@@ -43,10 +43,11 @@ class BookSearch extends Book
     {
         $query = Book::find()->joinWith('authors')->distinct();;
 
-        // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => ['book_id' => SORT_DESC]
+            ],
         ]);
 
         $dataProvider->sort->attributes['author'] = [
